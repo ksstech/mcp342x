@@ -78,10 +78,10 @@ float	mcp342xGetValue(epw_t * psEWS) ;
 // ######################################### Constants #############################################
 
 const uint16_t mcp342xDelay[4] = {
-	pdMS_TO_TICKS(5),				// 12 bit	1000 / 240	4.167mS
-	pdMS_TO_TICKS(17),				// 14 bit	1000 / 60	16.667mS
-	pdMS_TO_TICKS(67),				// 16 bit	1000 / 15	66.667mS
-	pdMS_TO_TICKS(267),				// 18 bit	1000 / 3.75	266.667mS
+	5,								// 12 bit	1000 / 240	4.167mS
+	17,								// 14 bit	1000 / 60	16.667mS
+	67,								// 16 bit	1000 / 15	66.667mS
+	267,							// 18 bit	1000 / 3.75	266.667mS
 } ;
 
 const vt_enum_t	sMCP342XFunc = {
@@ -233,7 +233,7 @@ int	mcp342xIdentify(i2c_di_t * psI2C_DI) {
 	psI2C_DI->TOuS = 400;			// Max 13000 (13mS)
 	psI2C_DI->Test	= 1;
 	uint8_t u8Buf[4];
-	int iRV = halI2C_Queue(psI2C_DI, i2cR_B, NULL, 0, u8Buf, sizeof(u8Buf), (i2cq_p1_t) NULL, (i2cq_p2_t) (uint32_t) 0) ;
+	int iRV = halI2C_Queue(psI2C_DI, i2cR_B, NULL, 0, u8Buf, sizeof(u8Buf), (i2cq_p1_t) NULL, (i2cq_p2_t) (uint32_t) 0);
 	psI2C_DI->Test = 0 ;
 	IF_PRINT(debugCONFIG, "mcp342x ID [ %-'B ]", sizeof(u8Buf), u8Buf) ;
 	if ((iRV == erSUCCESS) && (u8Buf[3] == 0x90)) {
