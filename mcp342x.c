@@ -229,8 +229,8 @@ int mcp342xConfigMode(rule_t * psR, int Xcur, int Xmax) {
  * @return	erSUCCESS if supported device was detected, if not erFAILURE
  */
 int	mcp342xIdentify(i2c_di_t * psI2C_DI) {
-	psI2C_DI->Delay	= 20;
-	psI2C_DI->TOuS = 400;			// Max 13000 (13mS)
+	psI2C_DI->TRXmS	= 20;
+	psI2C_DI->CLKuS = 400;			// Max 13000 (13mS)
 	psI2C_DI->Test	= 1;
 	uint8_t u8Buf[4];
 	int iRV = halI2C_Queue(psI2C_DI, i2cR_B, NULL, 0, u8Buf, sizeof(u8Buf), (i2cq_p1_t) NULL, (i2cq_p2_t) (uint32_t) 0);
