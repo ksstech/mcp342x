@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Andre M. Maree/KSS Technologies (Pty) Ltd.
+ * Copyright 2021-22 Andre M. Maree/KSS Technologies (Pty) Ltd.
  */
 
 #include	"hal_variables.h"
@@ -67,6 +67,9 @@
 
 // ###################################### Local variables ##########################################
 
+mcp342x_t *	psaMCP342X = NULL;
+epw_t *	psaMCP342X_EP = NULL;
+uint8_t	mcp342xNumDev = 0, mcp342xNumCh	= 0;
 
 // ################################ Forward function declaration ###################################
 
