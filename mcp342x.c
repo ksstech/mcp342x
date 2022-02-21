@@ -202,7 +202,7 @@ int	mcp342xReadHdlr(epw_t * psEWx) {
 
 int mcp342xConfigMode(rule_t * psR, int Xcur, int Xmax) {
 	if (psaMCP342X == NULL)
-		ERR_RETURN("No MCP342X enumerated", erSCRIPT_INV_OPERATION);
+		ERR_RETURN("No MCP342X enumerated", erINVALID_OPERATION);
 	uint8_t	AI = psR->ActIdx ;
 //	int EI	= psR->actPar0[AI] ;						// get endpoint URI
 
