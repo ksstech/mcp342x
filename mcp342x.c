@@ -159,10 +159,10 @@ void mcp342xReadCB(void * pvPara) {
 	mcp342xSetBusy(mcp342xMap2Dev(ch), 0) ;
 	mcp342x_cfg_t sChCfg = { .Conf = mcp342xBuf[sizeof(mcp342xBuf)-1] };
 	IF_EXEC_1(debugCONVERT, mcp342xReportChan, sChCfg.Conf);
-	IF_P(debugCONVERT, " [ %-'B ]", sizeof(mcp342xBuf), mcp342xBuf);
+	IF_P(debugCONVERT, " [ %-`B ]", sizeof(mcp342xBuf), mcp342xBuf);
 	if (sChCfg.RATE != mcp342xR18_3_75)
 		mcp342xBuf[0] = (mcp342xBuf[1] & 0x80) ? 0xFF : 0x00;
-	IF_P(debugCONVERT, " [ %-'B ]", sizeof(mcp342xBuf), mcp342xBuf);
+	IF_P(debugCONVERT, " [ %-`B ]", sizeof(mcp342xBuf), mcp342xBuf);
 	int Raw = (mcp342xBuf[mcp342xR0] << 16) | (mcp342xBuf[mcp342xR1] << 8) | mcp342xBuf[mcp342xR2];
 	x64_t X64 ;
 	X64.x32[0].f32 = (float) Raw *  0.000015625 ;
@@ -238,7 +238,7 @@ int	mcp342xIdentify(i2c_di_t * psI2C_DI) {
 	uint8_t u8Buf[4];
 	int iRV = halI2C_Queue(psI2C_DI, i2cR_B, NULL, 0, u8Buf, sizeof(u8Buf), (i2cq_p1_t) NULL, (i2cq_p2_t) (uint32_t) 0);
 	psI2C_DI->Test = 0 ;
-	IF_P(debugCONFIG, "mcp342x ID [ %-'B ]", sizeof(u8Buf), u8Buf) ;
+	IF_P(debugCONFIG, "mcp342x ID [ %-`B ]", sizeof(u8Buf), u8Buf) ;
 	if ((iRV == erSUCCESS) && (u8Buf[3] == 0x90)) {
 		psI2C_DI->Type		= i2cDEV_MCP342X ;
 		// 5 bytes = 500uS @ 100KHz, 125uS @ 400Khz
