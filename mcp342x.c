@@ -201,28 +201,22 @@ int	mcp342xReadHdlr(epw_t * psEWx) {
 }
 
 int mcp342xConfigMode(rule_t * psR, int Xcur, int Xmax) {
-	if (psaMCP342X == NULL)
-		ERR_RETURN("No MCP342X enumerated", erINVALID_OPERATION);
+	IF_RETURN_MX(psaMCP342X == NULL, "No MCP342X enumerated", erINVALID_OPERATION);
 	uint8_t	AI = psR->ActIdx ;
-//	int EI	= psR->actPar0[AI] ;						// get endpoint URI
-
 	uint32_t mode = psR->para.x32[AI][0].u32;
 	uint32_t rate = psR->para.x32[AI][1].u32;
 	uint32_t gain = psR->para.x32[AI][2].u32;
 	IF_P(debugCONFIG, "MCP342X Mode p0=%d p1=%d p2=%d p3=%d\n", Xcur, mode, rate, gain) ;
 
-	int iRV = 0 ;
-	if ((mode <= mcp342xM3) && (rate <= mcp342xR18_3_75) && (gain <= mcp342xG8)) {
-		do {
-			int dev = mcp342xMap2Dev(Xcur) ;
-			int ch = Xcur - psaMCP342X[dev].ChLo ;
-			psaMCP342X[dev].Chan[ch].PGA	= gain ;
-			psaMCP342X[dev].Chan[ch].RATE	= rate ;
-			maskSET2B(psaMCP342X[dev].Modes, ch, mode, uint32_t) ;
-		} while (++Xcur < Xmax);
-	} else
-		SL_ERR("Invalid mode/resolution/gain");
-	return iRV ;
+	IF_RETURN_MX(mode > mcp342xM3 || rate > mcp342xR18_3_75 || gain > mcp342xG8, "Invalid mode/resolution/gain", erINVALID_PARA);
+	do {
+		int dev = mcp342xMap2Dev(Xcur) ;
+		int ch = Xcur - psaMCP342X[dev].ChLo ;
+		psaMCP342X[dev].Chan[ch].PGA = gain ;
+		psaMCP342X[dev].Chan[ch].RATE = rate ;
+		maskSET2B(psaMCP342X[dev].Modes, ch, mode, uint32_t) ;
+	} while (++Xcur < Xmax);
+	return erSUCCESS;
 }
 
 // ################### Identification, Diagnostics & Configuration functions #######################
