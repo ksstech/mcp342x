@@ -145,7 +145,7 @@ void mcp342xSetSense(epw_t * psEWP, epw_t * psEWS) {
 	psEWP->Rsns = psEWP->Tsns ;
 }
 
-float mcp342xGetValue(epw_t * psEWS) { return psEWS->var.val.x32.f32 ; }
+float mcp342xGetValue(epw_t * psEWS) { return psEWS->var.val.x32.f32; }
 
 uint8_t	mcp342xBuf[4] ;
 
