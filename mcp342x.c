@@ -202,7 +202,7 @@ int mcp342xConfigMode(rule_t * psR, int Xcur, int Xmax) {
 	uint32_t mode = psR->para.x32[AI][0].u32;
 	uint32_t rate = psR->para.x32[AI][1].u32;
 	uint32_t gain = psR->para.x32[AI][2].u32;
-	IF_P(debugCONFIG, "MCP342X Mode p0=%d p1=%d p2=%d p3=%d\r\n", Xcur, mode, rate, gain) ;
+	IF_P(debugTRACK && ioB1GET(ioMode), "MCP342X Mode p0=%d p1=%d p2=%d p3=%d\r\n", Xcur, mode, rate, gain) ;
 
 	IF_RETURN_MX(mode > mcp342xM3 || rate > mcp342xR18_3_75 || gain > mcp342xG8, "Invalid mode/resolution/gain", erINVALID_PARA);
 	do {
@@ -228,14 +228,14 @@ int	mcp342xIdentify(i2c_di_t * psI2C_DI) {
 	uint8_t u8Buf[4];
 	int iRV = halI2C_Queue(psI2C_DI, i2cR_B, NULL, 0, u8Buf, sizeof(u8Buf), (i2cq_p1_t) NULL, (i2cq_p2_t) (uint32_t) 0);
 	psI2C_DI->Test = 0 ;
-	IF_P(debugCONFIG, "mcp342x ID [ %-`B ]", sizeof(u8Buf), u8Buf) ;
+	IF_P(debugTRACK && ioB1GET(ioI2Cinit), "mcp342x ID [ %-`B ]", sizeof(u8Buf), u8Buf) ;
 	if ((iRV == erSUCCESS) && (u8Buf[3] == 0x90)) {
 		psI2C_DI->Type		= i2cDEV_MCP342X ;
 		// 5 bytes = 500uS @ 100KHz, 125uS @ 400Khz
 		psI2C_DI->Speed		= i2cSPEED_400 ;
 		psI2C_DI->DevIdx 	= mcp342xNumDev++ ;
 		mcp342xNumCh		+= 4 ;						// MCP3424 specific
-		IF_P(debugCONFIG,"  Addr=0x%02X", psI2C_DI->Addr) ;
+		IF_P(debugTRACK && ioB1GET(ioI2Cinit),"  Addr=0x%02X", psI2C_DI->Addr) ;
 	}
 	return iRV ;
 }
@@ -287,7 +287,7 @@ int	mcp342xConfig(i2c_di_t * psI2C_DI) {
 	}
 	// Default mode is 240SPS ie. 1000 / 240 = 4.167mS
 	psMCP342X->timer = xTimerCreate("mcp342x", pdMS_TO_TICKS(5), pdFALSE, NULL, mcp342xTimerHdlr);
-	IF_P(debugCONFIG," %d of %d\r\n", psI2C_DI->DevIdx, mcp342xNumDev) ;
+	IF_P(debugTRACK && ioB1GET(ioI2Cinit)," %d of %d\r\n", psI2C_DI->DevIdx, mcp342xNumDev) ;
 	return erSUCCESS ;
 }
 
