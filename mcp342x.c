@@ -1,23 +1,19 @@
 /*
- * Copyright 2021-22 Andre M. Maree/KSS Technologies (Pty) Ltd.
+ * Copyright (c) 2021-22 Andre M. Maree / KSS Technologies (Pty) Ltd.
  */
 
-#include	"hal_variables.h"
-#include	"mcp342x.h"
-#include	"FreeRTOS_Support.h"
-#include	"printfx.h"
-#include	"syslog.h"
-#include	"systiming.h"								// timing debugging
-#include	"x_errors_events.h"
-#include	"x_string_general.h"
-
-#include	<string.h>
-#include	<stdint.h>
+#include "hal_variables.h"
+#include "mcp342x.h"
+#include "FreeRTOS_Support.h"
+#include "printfx.h"
+#include "syslog.h"
+#include "systiming.h"								// timing debugging
+#include "x_errors_events.h"
+#include "x_string_general.h"
 
 #define	debugFLAG					0xF000
 
-#define	debugCONFIG					(debugFLAG & 0x0001)
-#define	debugCONVERT				(debugFLAG & 0x0002)
+#define	debugCONVERT				(debugFLAG & 0x0001)
 
 #define	debugTIMING					(debugFLAG_GLOBAL & debugFLAG & 0x1000)
 #define	debugTRACK					(debugFLAG_GLOBAL & debugFLAG & 0x2000)
