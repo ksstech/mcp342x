@@ -103,7 +103,7 @@ const vt_enum_t	sMCP342XFunc = {
 
 int	mcp342xMap2Dev(int LogCh) {
 	for (int dev = 0; dev < mcp342xNumDev; ++dev) {
-		if (INRANGE(psaMCP342X[dev].ChLo, LogCh, psaMCP342X[dev].ChHi, uint8_t)) return dev ;
+		if (INRANGE(psaMCP342X[dev].ChLo, LogCh, psaMCP342X[dev].ChHi)) return dev ;
 	}
 	IF_myASSERT(debugRESULT, 0) ;
 	return erFAILURE ;
@@ -111,7 +111,7 @@ int	mcp342xMap2Dev(int LogCh) {
 
 void mcp342xSetBusy(int Dev, bool fBusy) {
 	for (int i = 0; i < mcp342xNumCh; ++i) {			// mark ALL EWS on current device busy
-		if (INRANGE(psaMCP342X[Dev].ChLo, i, psaMCP342X[Dev].ChHi, uint8_t)) psaMCP342X_EP[i].fBusy = fBusy;
+		if (INRANGE(psaMCP342X[Dev].ChLo, i, psaMCP342X[Dev].ChHi)) psaMCP342X_EP[i].fBusy = fBusy;
 	}
 }
 
