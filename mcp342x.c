@@ -69,10 +69,9 @@ uint8_t	mcp342xNumDev = 0, mcp342xNumCh	= 0;
 
 // ################################ Forward function declaration ###################################
 
-epw_t * mcp342xGetWork(int x) ;
-void	mcp342xSetDefault(epw_t * psEWP, epw_t *psEWS) ;
-void	mcp342xSetSense(epw_t * psEWP, epw_t * psEWS) ;
-float	mcp342xGetValue(epw_t * psEWS) ;
+epw_t * mcp342xGetWork(int x);
+void	mcp342xSetDefault(epw_t * psEWP, epw_t *psEWS);
+void	mcp342xSetSense(epw_t * psEWP, epw_t * psEWS);
 
 // ######################################### Constants #############################################
 
@@ -301,14 +300,14 @@ int	mcp342xReportChan(uint8_t Value) {
 }
 
 int	mcp342xReportDev(mcp342x_t * psMCP342X) {
-	int iRV = 0 ;
+	int iRV = 0;
 	for (int ch = 0; ch < psMCP342X->NumCh; ++ch) {
-		iRV += printfx("#%d - A=0x%02X", ch, psMCP342X->psI2C->Addr) ;
-		iRV += mcp342xReportChan(psMCP342X->Chan[ch].Conf) ;
-		int LogCh = psMCP342X->ChLo + ch ;
 		iRV += printfx("  L=%d  vNorm=%f\r\n", psMCP342X->ChLo + ch, xCV_GetValue(&psaMCP342X_EP[LogCh].var, NULL).f64) ;
+		iRV += printfx("#%d - A=0x%02X", ch, psMCP342X->psI2C->Addr);
+		iRV += mcp342xReportChan(psMCP342X->Chan[ch].Conf);
+		int LogCh = psMCP342X->ChLo + ch;
 	}
-	return iRV ;
+	return iRV;
 }
 
 int	mcp342xReportAll(void) {
