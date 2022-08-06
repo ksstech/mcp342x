@@ -1,7 +1,15 @@
+# MCP342X
+
+set( srcs "mcp342x.c" )
+set( include_dirs "." )
+set( priv_include_dirs )
+set( requires endpoints hal_esp32 )
+set( priv_requires commands driver printfx rules syslog systiming )
+				
 idf_component_register(
-	SRCS "mcp342x.c"
-	INCLUDE_DIRS "."
-	PRIV_INCLUDE_DIRS
-	REQUIRES endpoints hal_esp32
-	PRIV_REQUIRES commands printfx rules syslog systiming
+	SRCS ${srcs} 
+	INCLUDE_DIRS ${include_dirs} 
+	PRIV_INCLUDE_DIRS ${priv_include_dirs} 
+	REQUIRES ${requires} 
+	PRIV_REQUIRES ${priv_requires}
 )
