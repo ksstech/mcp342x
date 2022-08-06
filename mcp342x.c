@@ -86,7 +86,7 @@ const vt_enum_t	sMCP342XFunc = {
 	.work	= mcp342xGetWork,
 	.reset	= mcp342xSetDefault,
 	.sense	= mcp342xSetSense,
-	.get	= mcp342xGetValue,
+	.get	= xEpGetValue,
 } ;
 
 // ###################################### Private functions ########################################
@@ -139,8 +139,6 @@ void mcp342xSetSense(epw_t * psEWP, epw_t * psEWS) {
 	// restart SNS timer
 	psEWP->Rsns = psEWP->Tsns ;
 }
-
-float mcp342xGetValue(epw_t * psEWS) { return psEWS->var.val.x32.f32; }
 
 uint8_t	mcp342xBuf[4] ;
 
@@ -302,10 +300,10 @@ int	mcp342xReportChan(uint8_t Value) {
 int	mcp342xReportDev(mcp342x_t * psMCP342X) {
 	int iRV = 0;
 	for (int ch = 0; ch < psMCP342X->NumCh; ++ch) {
-		iRV += printfx("  L=%d  vNorm=%f\r\n", psMCP342X->ChLo + ch, xCV_GetValue(&psaMCP342X_EP[LogCh].var, NULL).f64) ;
 		iRV += printfx("#%d - A=0x%02X", ch, psMCP342X->psI2C->Addr);
 		iRV += mcp342xReportChan(psMCP342X->Chan[ch].Conf);
 		int LogCh = psMCP342X->ChLo + ch;
+		iRV += printfx("  L=%d  vNorm=%f\r\n", psMCP342X->ChLo + ch, xCV_GetValueScaled(&psaMCP342X_EP[LogCh].var, NULL).f64);
 	}
 	return iRV;
 }
