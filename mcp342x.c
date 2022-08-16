@@ -86,7 +86,6 @@ const vt_enum_t	sMCP342XFunc = {
 	.work	= mcp342xGetWork,
 	.reset	= mcp342xSetDefault,
 	.sense	= mcp342xSetSense,
-	.get	= xEpGetValue,
 } ;
 
 // ###################################### Private functions ########################################
@@ -159,7 +158,7 @@ void mcp342xReadCB(void * pvPara) {
 	int Raw = (mcp342xBuf[mcp342xR0] << 16) | (mcp342xBuf[mcp342xR1] << 8) | mcp342xBuf[mcp342xR2];
 	x64_t X64 ;
 	X64.x32[0].f32 = (float) Raw *  0.000015625 ;
-	vCV_SetValue(&psaMCP342X_EP[ch].var, X64) ;
+	vCV_SetValueRaw(&psaMCP342X_EP[ch].var, X64) ;
 	IF_P(debugCONVERT, " Raw=%d Norm=%f %s\r\n", Raw, X64.x32[0].f32, sChCfg.nRDY ? " (OLD sample)" : "");
 }
 
@@ -194,14 +193,14 @@ int	mcp342xReadHdlr(epw_t * psEWx) {
 }
 
 int mcp342xConfigMode(rule_t * psR, int Xcur, int Xmax) {
-	IF_RETURN_MX(psaMCP342X == NULL, "No MCP342X enumerated", erINVALID_OPERATION);
+	IF_RETURN_MX(psaMCP342X == NULL, "No MCP342X enumerated", erINV_OPERATION);
 	uint8_t	AI = psR->ActIdx ;
 	uint32_t mode = psR->para.x32[AI][0].u32;
 	uint32_t rate = psR->para.x32[AI][1].u32;
 	uint32_t gain = psR->para.x32[AI][2].u32;
 	IF_P(debugTRACK && ioB1GET(ioMode), "MCP342X Mode p0=%d p1=%d p2=%d p3=%d\r\n", Xcur, mode, rate, gain) ;
 
-	IF_RETURN_MX(mode > mcp342xM3 || rate > mcp342xR18_3_75 || gain > mcp342xG8, "Invalid mode/resolution/gain", erINVALID_PARA);
+	IF_RETURN_MX(mode > mcp342xM3 || rate > mcp342xR18_3_75 || gain > mcp342xG8, "Invalid mode/resolution/gain", erINV_PARA);
 	do {
 		int dev = mcp342xMap2Dev(Xcur) ;
 		int ch = Xcur - psaMCP342X[dev].ChLo ;
@@ -242,12 +241,10 @@ int	mcp342xConfig(i2c_di_t * psI2C_DI) {
 		IF_myASSERT(debugPARAM, psI2C_DI->DevIdx == 0) ;
 		// Primary endpoint init
 		epw_t * psEWP = &table_work[URI_MCP342X];
-		psEWP->var.def.cv.pntr	= 1 ;
-		psEWP->var.def.cv.vf	= vfFXX ;
+		psEWP->var.def = SETDEF_CVAR(0, 1, vtVALUE, cvF32, 0);
 		psEWP->var.def.cv.ve	= 1;
-		psEWP->var.def.cv.vs	= vs32B ;
-		psEWP->var.def.cv.vc	= mcp342xNumCh ;
-		psEWP->var.val.px.pv	= (void *) &sMCP342XFunc ;
+		psEWP->var.def.cv.vc	= mcp342xNumCh;
+		psEWP->var.val.px.pv	= (void *) &sMCP342XFunc;
 		psEWP->Tsns = psEWP->Rsns = MCP342X_T_SNS;
 		psEWP->uri = URI_MCP342X;
 		psEWP->fSECsns = 1;								// req due to delays, no parallel reads
@@ -256,12 +253,9 @@ int	mcp342xConfig(i2c_di_t * psI2C_DI) {
 		psaMCP342X_EP = pvRtosMalloc(mcp342xNumCh * sizeof(epw_t)) ;
 		memset(psaMCP342X_EP, 0, mcp342xNumCh * sizeof(epw_t)) ;
 		for (int ch = 0 ; ch < mcp342xNumCh; ++ch) {
-			epw_t * psEWS = &psaMCP342X_EP[ch] ;
-			psEWS->var.def.cv.vf	= vfFXX ;
-			psEWS->var.def.cv.vt	= vtVALUE ;
-			psEWS->var.def.cv.vs	= vs32B ;
-			psEWS->var.def.cv.vc	= 1 ;
-			psEWS->Tsns = psEWS->Rsns = MCP342X_T_SNS ;
+			epw_t * psEWS = &psaMCP342X_EP[ch];
+			psEWS->var.def = SETDEF_CVAR(0, 1, vtVALUE, cvF32, 1);
+			psEWS->Tsns = psEWS->Rsns = MCP342X_T_SNS;
 			psEWS->uri = URI_MCP342X ;
 			psEWS->idx = ch ;
 		}
