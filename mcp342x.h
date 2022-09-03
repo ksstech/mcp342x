@@ -45,31 +45,32 @@ enum { mcp342xM0, mcp342xM1, mcp342xM2, mcp342xM3 } ;
 
 typedef union mcp342x_cfg_t {
 	struct __attribute__((packed)) {
-/*LSB*/	uint8_t		PGA		: 2 ;						// Gain 1, 2, 4 or 8
-		uint8_t		RATE	: 2 ;						// Rate 240/12, 60/14, 15/16 or 3.75/18
-		uint8_t		OS_C	: 1 ;						// Mode 0=OneShot, 1=Continuous
-		uint8_t		CHAN	: 2 ;						// Channel 0 -> 3
-/*MSB*/	uint8_t		nRDY	: 1 ;						// RD=ReaDY, WR=1 for Convert
+/*LSB*/	u8_t		PGA		: 2 ;						// Gain 1, 2, 4 or 8
+		u8_t		RATE	: 2 ;						// Rate 240/12, 60/14, 15/16 or 3.75/18
+		u8_t		OS_C	: 1 ;						// Mode 0=OneShot, 1=Continuous
+		u8_t		CHAN	: 2 ;						// Channel 0 -> 3
+/*MSB*/	u8_t		nRDY	: 1 ;						// RD=ReaDY, WR=1 for Convert
 	} ;
-	uint8_t		Conf ;
+	u8_t		Conf ;
 } mcp342x_cfg_t ;
 DUMB_STATIC_ASSERT(sizeof(mcp342x_cfg_t) == 1) ;
 
-typedef struct __attribute__((packed)) {
-	i2c_di_t *	psI2C ;
-	SemaphoreHandle_t	mux ;
-	TimerHandle_t	timer ;
+typedef struct {
+	i2c_di_t * psI2C;
+	SemaphoreHandle_t mux;
+	TimerHandle_t th;
+	StaticTimer_t ts;
 	struct __attribute__((packed)) {
-		uint8_t		I2Cnum	: 4 ;						// index into I2C Device Info table
-		uint8_t		ChLo	: 4 ;
-		uint8_t		ChHi	: 4 ;
-		uint8_t		NumCh	: 3 ;						// 1, 2 or 4
-		uint32_t	Spare	: 17 ;
+		u8_t I2Cnum:4;				// index into I2C Device Info table
+		u8_t ChLo:4;
+		u8_t ChHi:4;
+		u8_t NumCh:3;				// 1, 2 or 4
+		u32_t Spare:17;
 	} ;
-	mcp342x_cfg_t	Chan[4] ;
-	uint32_t		Modes ;								// 16 x 2-bit flags, 2 per channel
+	mcp342x_cfg_t Chan[4];
+	u32_t Modes;								// 16 x 2-bit flags, 2 per channel
 } mcp342x_t ;
-DUMB_STATIC_ASSERT(sizeof(mcp342x_t) == (sizeof(i2c_di_t *) + sizeof(SemaphoreHandle_t) + 16)) ;
+DUMB_STATIC_ASSERT(sizeof(mcp342x_t) == (sizeof(i2c_di_t *) + sizeof(SemaphoreHandle_t) + 60));
 
 // ####################################### Public functions ########################################
 
@@ -80,7 +81,7 @@ int	mcp342xIdentify(i2c_di_t *) ;
 int	mcp342xConfig(i2c_di_t *) ;
 void	mcp342xReConfig(i2c_di_t * psI2C_DI) ;
 
-int	mcp342xReportChan(uint8_t) ;
+int	mcp342xReportChan(u8_t) ;
 int	mcp342xReportDev(mcp342x_t *) ;
 int	mcp342xReportAll(void) ;
 

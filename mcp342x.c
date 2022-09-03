@@ -187,9 +187,9 @@ int	mcp342xReadHdlr(epw_t * psEWx) {
 	// Address & configure channel, start conversion
 	mcp342x_t * psMCP342X = &psaMCP342X[dev] ;
 	mcp342x_cfg_t sChCfg = psMCP342X->Chan[ch - psMCP342X->ChLo] ;
-	vTimerSetTimerID(psMCP342X->timer, (void *) psEWx);	// make available to next stage
+	vTimerSetTimerID(psMCP342X->th, (void *) psEWx);	// make available to next stage
 	return halI2C_Queue(psMCP342X->psI2C, i2cWT, &sChCfg.Conf, sizeof(uint8_t), NULL, 0,
-			(i2cq_p1_t) psMCP342X->timer, (i2cq_p2_t) (uint32_t) mcp342xDelay[sChCfg.RATE]) ;
+			(i2cq_p1_t) psMCP342X->th, (i2cq_p2_t) (uint32_t) mcp342xDelay[sChCfg.RATE]) ;
 }
 
 int mcp342xConfigMode(rule_t * psR, int Xcur, int Xmax) {
@@ -198,7 +198,7 @@ int mcp342xConfigMode(rule_t * psR, int Xcur, int Xmax) {
 	uint32_t mode = psR->para.x32[AI][0].u32;
 	uint32_t rate = psR->para.x32[AI][1].u32;
 	uint32_t gain = psR->para.x32[AI][2].u32;
-	IF_P(debugTRACK && ioB1GET(ioMode), "MCP342X Mode p0=%d p1=%d p2=%d p3=%d\r\n", Xcur, mode, rate, gain) ;
+	IF_P(debugTRACK && ioB1GET(dbgMode), "MCP342X Mode p0=%d p1=%d p2=%d p3=%d\r\n", Xcur, mode, rate, gain) ;
 
 	IF_RETURN_MX(mode > mcp342xM3 || rate > mcp342xR18_3_75 || gain > mcp342xG8, "Invalid mode/resolution/gain", erINV_PARA);
 	do {
@@ -274,10 +274,10 @@ int	mcp342xConfig(i2c_di_t * psI2C_DI) {
 	for (int ch = 0 ; ch < psMCP342X->NumCh; ++ch) {
 		psMCP342X->Chan[ch].Conf = 0x90 ;
 		psMCP342X->Chan[ch].CHAN = ch ;
-		maskSET2B(psMCP342X->Modes, ch, mcp342xM1, uint32_t)	;	// default mode
+		maskSET2B(psMCP342X->Modes, ch, mcp342xM1, u32_t);	// default mode
 	}
 	// Default mode is 240SPS ie. 1000 / 240 = 4.167mS
-	psMCP342X->timer = xTimerCreate("mcp342x", pdMS_TO_TICKS(5), pdFALSE, NULL, mcp342xTimerHdlr);
+	psMCP342X->th = xTimerCreateStatic("mcp342x", pdMS_TO_TICKS(5), pdFALSE, NULL, mcp342xTimerHdlr, &psMCP342X->ts);
 	IF_P(debugTRACK && ioB1GET(ioI2Cinit)," %d of %d\r\n", psI2C_DI->DevIdx, mcp342xNumDev) ;
 	return erSUCCESS ;
 }
