@@ -65,7 +65,7 @@
 
 mcp342x_t *	psaMCP342X = NULL;
 epw_t *	psaMCP342X_EP = NULL;
-uint8_t	mcp342xNumDev = 0, mcp342xNumCh	= 0;
+u8_t	mcp342xNumDev = 0, mcp342xNumCh	= 0;
 
 // ################################ Forward function declaration ###################################
 
@@ -75,7 +75,7 @@ void	mcp342xSetSense(epw_t * psEWP, epw_t * psEWS);
 
 // ######################################### Constants #############################################
 
-const uint16_t mcp342xDelay[4] = {
+const u16_t mcp342xDelay[4] = {
 	5,								// 12 bit	1000 / 240	4.167mS
 	17,								// 14 bit	1000 / 60	16.667mS
 	67,								// 16 bit	1000 / 15	66.667mS
@@ -139,7 +139,7 @@ void mcp342xSetSense(epw_t * psEWP, epw_t * psEWS) {
 	psEWP->Rsns = psEWP->Tsns ;
 }
 
-uint8_t	mcp342xBuf[4] ;
+u8_t mcp342xBuf[4];
 
 /**
  * @brief	step 3: sample read, convert  store
@@ -147,7 +147,7 @@ uint8_t	mcp342xBuf[4] ;
  */
 void mcp342xReadCB(void * pvPara) {
 	epw_t * psEWS = pvPara;
-	uint8_t	ch	= psEWS->idx;							// Logical channel #
+	u8_t ch	= psEWS->idx;							// Logical channel #
 	mcp342xSetBusy(mcp342xMap2Dev(ch), 0) ;
 	mcp342x_cfg_t sChCfg = { .Conf = mcp342xBuf[sizeof(mcp342xBuf)-1] };
 	IF_EXEC_1(debugCONVERT, mcp342xReportChan, sChCfg.Conf);
@@ -168,8 +168,8 @@ void mcp342xReadCB(void * pvPara) {
  */
 void mcp342xTimerHdlr(TimerHandle_t xTimer) {
 	epw_t * psEWS = pvTimerGetTimerID(xTimer) ;
-	uint8_t	ch	= psEWS->idx ;							// Logical channel #
-	uint8_t dev	= mcp342xMap2Dev(ch) ;					// Device #
+	u8_t ch = psEWS->idx ;							// Logical channel #
+	u8_t dev = mcp342xMap2Dev(ch) ;					// Device #
 	mcp342x_t * psMCP342X = &psaMCP342X[dev] ;
 	int xLen = psMCP342X->Chan[ch - psMCP342X->ChLo].RATE == mcp342xR18_3_75 ? 4 : 3 ;
 	halI2C_Queue(psMCP342X->psI2C, i2cRC, NULL, 0, &mcp342xBuf[4-xLen], xLen,
@@ -181,23 +181,23 @@ void mcp342xTimerHdlr(TimerHandle_t xTimer) {
  * @param 	pointer to endpoint to be read
  */
 int	mcp342xReadHdlr(epw_t * psEWx) {
-	uint8_t	ch	= psEWx->idx ;
-	uint8_t dev	= mcp342xMap2Dev(ch) ;
+	u8_t ch	= psEWx->idx ;
+	u8_t dev = mcp342xMap2Dev(ch) ;
 	mcp342xSetBusy(dev, 1) ;
 	// Address & configure channel, start conversion
 	mcp342x_t * psMCP342X = &psaMCP342X[dev] ;
 	mcp342x_cfg_t sChCfg = psMCP342X->Chan[ch - psMCP342X->ChLo] ;
 	vTimerSetTimerID(psMCP342X->th, (void *) psEWx);	// make available to next stage
-	return halI2C_Queue(psMCP342X->psI2C, i2cWT, &sChCfg.Conf, sizeof(uint8_t), NULL, 0,
+	return halI2C_Queue(psMCP342X->psI2C, i2cWT, &sChCfg.Conf, sizeof(u8_t), NULL, 0,
 			(i2cq_p1_t) psMCP342X->th, (i2cq_p2_t) (uint32_t) mcp342xDelay[sChCfg.RATE]) ;
 }
 
 int mcp342xConfigMode(rule_t * psR, int Xcur, int Xmax) {
 	IF_RETURN_MX(psaMCP342X == NULL, "No MCP342X enumerated", erINV_OPERATION);
-	uint8_t	AI = psR->ActIdx ;
-	uint32_t mode = psR->para.x32[AI][0].u32;
-	uint32_t rate = psR->para.x32[AI][1].u32;
-	uint32_t gain = psR->para.x32[AI][2].u32;
+	u8_t AI = psR->ActIdx ;
+	u32_t mode = psR->para.x32[AI][0].u32;
+	u32_t rate = psR->para.x32[AI][1].u32;
+	u32_t gain = psR->para.x32[AI][2].u32;
 	IF_P(debugTRACK && ioB1GET(dbgMode), "MCP342X Mode p0=%d p1=%lu p2=%lu p3=%lu\r\n", Xcur, mode, rate, gain) ;
 
 	IF_RETURN_MX(mode > mcp342xM3 || rate > mcp342xR18_3_75 || gain > mcp342xG8, "Invalid mode/resolution/gain", erINV_PARA);
@@ -206,7 +206,7 @@ int mcp342xConfigMode(rule_t * psR, int Xcur, int Xmax) {
 		int ch = Xcur - psaMCP342X[dev].ChLo ;
 		psaMCP342X[dev].Chan[ch].PGA = gain ;
 		psaMCP342X[dev].Chan[ch].RATE = rate ;
-		maskSET2B(psaMCP342X[dev].Modes, ch, mode, uint32_t) ;
+		maskSET2B(psaMCP342X[dev].Modes, ch, mode, u32_t) ;
 	} while (++Xcur < Xmax);
 	return erSUCCESS;
 }
@@ -221,8 +221,8 @@ int	mcp342xIdentify(i2c_di_t * psI2C_DI) {
 	psI2C_DI->TRXmS	= 20;
 	psI2C_DI->CLKuS = 400;			// Max 13000 (13mS)
 	psI2C_DI->Test	= 1;
-	uint8_t u8Buf[4];
-	int iRV = halI2C_Queue(psI2C_DI, i2cR_B, NULL, 0, u8Buf, sizeof(u8Buf), (i2cq_p1_t) NULL, (i2cq_p2_t) (uint32_t) 0);
+	u8_t u8Buf[4];
+	int iRV = halI2C_Queue(psI2C_DI, i2cR_B, NULL, 0, u8Buf, sizeof(u8Buf), (i2cq_p1_t) NULL, (i2cq_p2_t) (u32_t) 0);
 	psI2C_DI->Test = 0 ;
 	IF_PX(debugTRACK && ioB1GET(ioI2Cinit), "mcp342x ID [ %-'hhY ]", sizeof(u8Buf), u8Buf) ;
 	if ((iRV == erSUCCESS) && (u8Buf[3] == 0x90)) {
@@ -284,7 +284,7 @@ int	mcp342xConfig(i2c_di_t * psI2C_DI) {
 
 void mcp342xReConfig(i2c_di_t * psI2C_DI) { }
 
-int	mcp342xReportChan(uint8_t Value) {
+int	mcp342xReportChan(u8_t Value) {
 	mcp342x_cfg_t sChCfg ;
 	sChCfg.Conf = Value ;
 	return printf("  Cfg=0x%02X  nRDY=%d  C=%d  OS_C=%d  SAMP=%d  PGA=%d",
