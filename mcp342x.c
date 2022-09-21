@@ -151,10 +151,10 @@ void mcp342xReadCB(void * pvPara) {
 	mcp342xSetBusy(mcp342xMap2Dev(ch), 0) ;
 	mcp342x_cfg_t sChCfg = { .Conf = mcp342xBuf[sizeof(mcp342xBuf)-1] };
 	IF_EXEC_1(debugCONVERT, mcp342xReportChan, sChCfg.Conf);
-	IF_P(debugCONVERT, " [ %-`B ]", sizeof(mcp342xBuf), mcp342xBuf);
+	IF_PX(debugCONVERT, " [ %-'hhY ]", sizeof(mcp342xBuf), mcp342xBuf);
 	if (sChCfg.RATE != mcp342xR18_3_75)
 		mcp342xBuf[0] = (mcp342xBuf[1] & 0x80) ? 0xFF : 0x00;
-	IF_P(debugCONVERT, " [ %-`B ]", sizeof(mcp342xBuf), mcp342xBuf);
+	IF_PX(debugCONVERT, " [ %-'hhY ]", sizeof(mcp342xBuf), mcp342xBuf);
 	int Raw = (mcp342xBuf[mcp342xR0] << 16) | (mcp342xBuf[mcp342xR1] << 8) | mcp342xBuf[mcp342xR2];
 	x64_t X64 ;
 	X64.x32[0].f32 = (float) Raw *  0.000015625 ;
@@ -198,7 +198,7 @@ int mcp342xConfigMode(rule_t * psR, int Xcur, int Xmax) {
 	uint32_t mode = psR->para.x32[AI][0].u32;
 	uint32_t rate = psR->para.x32[AI][1].u32;
 	uint32_t gain = psR->para.x32[AI][2].u32;
-	IF_P(debugTRACK && ioB1GET(dbgMode), "MCP342X Mode p0=%d p1=%d p2=%d p3=%d\r\n", Xcur, mode, rate, gain) ;
+	IF_P(debugTRACK && ioB1GET(dbgMode), "MCP342X Mode p0=%d p1=%lu p2=%lu p3=%lu\r\n", Xcur, mode, rate, gain) ;
 
 	IF_RETURN_MX(mode > mcp342xM3 || rate > mcp342xR18_3_75 || gain > mcp342xG8, "Invalid mode/resolution/gain", erINV_PARA);
 	do {
@@ -224,7 +224,7 @@ int	mcp342xIdentify(i2c_di_t * psI2C_DI) {
 	uint8_t u8Buf[4];
 	int iRV = halI2C_Queue(psI2C_DI, i2cR_B, NULL, 0, u8Buf, sizeof(u8Buf), (i2cq_p1_t) NULL, (i2cq_p2_t) (uint32_t) 0);
 	psI2C_DI->Test = 0 ;
-	IF_P(debugTRACK && ioB1GET(ioI2Cinit), "mcp342x ID [ %-`B ]", sizeof(u8Buf), u8Buf) ;
+	IF_PX(debugTRACK && ioB1GET(ioI2Cinit), "mcp342x ID [ %-'hhY ]", sizeof(u8Buf), u8Buf) ;
 	if ((iRV == erSUCCESS) && (u8Buf[3] == 0x90)) {
 		psI2C_DI->Type		= i2cDEV_MCP342X ;
 		// 5 bytes = 500uS @ 100KHz, 125uS @ 400Khz
@@ -287,17 +287,17 @@ void mcp342xReConfig(i2c_di_t * psI2C_DI) { }
 int	mcp342xReportChan(uint8_t Value) {
 	mcp342x_cfg_t sChCfg ;
 	sChCfg.Conf = Value ;
-	return printfx("  Cfg=0x%02X  nRDY=%d  C=%d  OS_C=%d  SAMP=%d  PGA=%d",
+	return printf("  Cfg=0x%02X  nRDY=%d  C=%d  OS_C=%d  SAMP=%d  PGA=%d",
 			sChCfg.Conf, sChCfg.nRDY, sChCfg.CHAN, sChCfg.OS_C, sChCfg.RATE, sChCfg.PGA) ;
 }
 
 int	mcp342xReportDev(mcp342x_t * psMCP342X) {
 	int iRV = 0;
 	for (int ch = 0; ch < psMCP342X->NumCh; ++ch) {
-		iRV += printfx("#%d - A=0x%02X", ch, psMCP342X->psI2C->Addr);
+		iRV += printf("#%d - A=0x%02X", ch, psMCP342X->psI2C->Addr);
 		iRV += mcp342xReportChan(psMCP342X->Chan[ch].Conf);
 		int LogCh = psMCP342X->ChLo + ch;
-		iRV += printfx("  L=%d  vNorm=%f\r\n", psMCP342X->ChLo + ch, xCV_GetValueScaled(&psaMCP342X_EP[LogCh].var, NULL).f64);
+		iRV += printf("  L=%d  vNorm=%f\r\n", psMCP342X->ChLo + ch, xCV_GetValueScaled(&psaMCP342X_EP[LogCh].var, NULL).f64);
 	}
 	return iRV;
 }
