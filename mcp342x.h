@@ -6,7 +6,7 @@
 
 #include	"hal_config.h"
 #include	"hal_i2c.h"
-#include	"endpoint_struct.h"
+#include	"endpoints.h"
 #include	"rules_engine.h"
 
 #ifdef __cplusplus
