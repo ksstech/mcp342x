@@ -7,7 +7,7 @@
 #include	"hal_config.h"
 #include	"hal_i2c.h"
 #include	"endpoints.h"
-#include	"rules_engine.h"
+#include	"rules.h"
 
 #ifdef __cplusplus
 extern "C" {
