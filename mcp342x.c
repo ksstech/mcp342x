@@ -3,6 +3,7 @@
  */
 
 #include "hal_variables.h"
+#if (halHAS_MCP342X)
 #include "mcp342x.h"
 #include "FreeRTOS_Support.h"
 #include "printfx.h"
@@ -307,3 +308,4 @@ int	mcp342xReportAll(void) {
 	for (int dev = 0; dev < mcp342xNumDev; iRV += mcp342xReportDev(&psaMCP342X[dev++])) ;
 	return iRV ;
 }
+#endif
