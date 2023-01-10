@@ -3,6 +3,7 @@
  */
 
 #include "hal_variables.h"
+
 #if (halHAS_MCP342X)
 #include "mcp342x.h"
 #include "FreeRTOS_Support.h"
@@ -87,7 +88,8 @@ const vt_enum_t	sMCP342XFunc = {
 	.work	= mcp342xGetWork,
 	.reset	= mcp342xSetDefault,
 	.sense	= mcp342xSetSense,
-} ;
+	.report = NULL
+};
 
 // ###################################### Private functions ########################################
 

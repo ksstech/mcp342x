@@ -1,13 +1,13 @@
 /*
- * Copyright 2021 Andre M. Maree/KSS Technologies (Pty) Ltd.
+ * Copyright 2021-23 Andre M. Maree/KSS Technologies (Pty) Ltd.
  */
 
-#pragma		once
+#pragma once
 
-#include	"hal_config.h"
-#include	"hal_i2c.h"
-#include	"endpoints.h"
-#include	"rules.h"
+#include "hal_config.h"
+#include "hal_i2c.h"
+#include "endpoints.h"
+#include "rules.h"
 
 #ifdef __cplusplus
 extern "C" {
