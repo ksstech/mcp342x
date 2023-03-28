@@ -306,8 +306,9 @@ int	mcp342xReportDev(mcp342x_t * psMCP342X) {
 }
 
 int	mcp342xReportAll(void) {
-	int iRV = 0 ;
-	for (int dev = 0; dev < mcp342xNumDev; iRV += mcp342xReportDev(&psaMCP342X[dev++])) ;
-	return iRV ;
+	int iRV = 0;
+	for (int dev = 0; dev < mcp342xNumDev; iRV += mcp342xReportDev(&psaMCP342X[dev++]));
+	iRV += xRtosReportTimer(&sRprt, m90e26TH);
+	return iRV;
 }
 #endif
