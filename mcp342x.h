@@ -5,7 +5,7 @@
 #pragma once
 
 #include "hal_config.h"
-#include "hal_i2c.h"
+#include "hal_i2cm.h"
 #include "endpoints.h"
 #include "rules.h"
 
@@ -74,7 +74,7 @@ DUMB_STATIC_ASSERT(sizeof(mcp342x_t) == (sizeof(i2c_di_t *) + sizeof(SemaphoreHa
 
 // ####################################### Public functions ########################################
 
-int	mcp342xReadHdlr(epw_t *) ;
+int	mcp342xSense(epw_t *) ;
 int mcp342xConfigMode(rule_t * psR, int Xcur, int Xmax);
 
 int	mcp342xIdentify(i2c_di_t *) ;
