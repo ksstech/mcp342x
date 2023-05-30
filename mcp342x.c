@@ -175,8 +175,7 @@ void mcp342xTimerHdlr(TimerHandle_t xTimer) {
 	u8_t dev = mcp342xMap2Dev(ch);					// Device #
 	mcp342x_t * psMCP342X = &psaMCP342X[dev];
 	int xLen = psMCP342X->Chan[ch - psMCP342X->ChLo].RATE == mcp342xR18_3_75 ? 4 : 3;
-	halI2CM_Queue(psMCP342X->psI2C, i2cRC, NULL, 0, &mcp342xBuf[4-xLen], xLen,
-			(i2cq_p1_t) mcp342xReadCB, (i2cq_p2_t) (void *) psEWS);
+	halI2CM_Queue(psMCP342X->psI2C, i2cRC, NULL, 0, &mcp342xBuf[4-xLen], xLen, (i2cq_p1_t) mcp342xReadCB, (i2cq_p2_t) (void *) psEWS);
 }
 
 /**
