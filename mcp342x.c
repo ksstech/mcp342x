@@ -296,7 +296,7 @@ int	mcp342xReportDev(report_t * psR, mcp342x_t * psMCP342X) {
 	int iRV = 0;
 	for (int ch = 0; ch < psMCP342X->NumCh; ++ch) {
 		iRV += wprintfx(psR, "#%d - A=0x%02X", ch, psMCP342X->psI2C->Addr);
-		iRV += mcp342xReportChan(psMCP342X->Chan[ch].Conf);
+		iRV += mcp342xReportChan(psR, psMCP342X->Chan[ch].Conf);
 		int LogCh = psMCP342X->ChLo + ch;
 		iRV += wprintfx(psR, "  L=%d  vNorm=%f\r\n", psMCP342X->ChLo + ch, xCV_GetValueScaled(&psaMCP342X_EP[LogCh].var, NULL).f64);
 	}
