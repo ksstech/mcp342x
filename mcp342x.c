@@ -178,6 +178,16 @@ void mcp342xTimerHdlr(TimerHandle_t xTimer) {
 	halI2CM_Queue(psMCP342X->psI2C, i2cRC, NULL, 0, &mcp342xBuf[4-xLen], xLen, (i2cq_p1_t) mcp342xReadCB, (i2cq_p2_t) (void *) psEWS);
 }
 
+void mcp342xSenseCB(void * pV) {
+	epw_t * psEWx = (epw_t *) pV;
+	u8_t ch	= psEWx->idx;
+	u8_t dev = mcp342xMap2Dev(ch);
+	mcp342x_t * psMCP342X = &psaMCP342X[dev];
+	vTimerSetTimerID(psMCP342X->th, pV);	// make psEWx available to next stage
+	mcp342x_cfg_t sChCfg = psMCP342X->Chan[ch - psMCP342X->ChLo];
+	xTimerStart(psMCP342X->th, pdMS_TO_TICKS(mcp342xDelay[sChCfg.RATE]));
+}
+
 /**
  * @brief	step 1: trigger A->D conversion with delay
  * @param 	pointer to endpoint to be read
@@ -189,9 +199,7 @@ int	mcp342xSense(epw_t * psEWx) {
 	// Address & configure channel, start conversion
 	mcp342x_t * psMCP342X = &psaMCP342X[dev];
 	mcp342x_cfg_t sChCfg = psMCP342X->Chan[ch - psMCP342X->ChLo];
-	vTimerSetTimerID(psMCP342X->th, (void *) psEWx);	// make available to next stage
-	return halI2CM_Queue(psMCP342X->psI2C, i2cWT, &sChCfg.Conf, sizeof(u8_t), NULL, 0,
-			(i2cq_p1_t) psMCP342X->th, (i2cq_p2_t) (uint32_t) mcp342xDelay[sChCfg.RATE]);
+	return halI2CM_Queue(psMCP342X->psI2C, i2cWC, &sChCfg.Conf, sizeof(u8_t), NULL, 0, (i2cq_p1_t) mcp342xSenseCB, (i2cq_p2_t) (void *) psEWx);
 }
 
 int mcp342xConfigMode(rule_t * psR, int Xcur, int Xmax) {
