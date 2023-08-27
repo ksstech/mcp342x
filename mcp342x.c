@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-22 Andre M. Maree / KSS Technologies (Pty) Ltd.
+ * Copyright (c) 2021-23 Andre M. Maree / KSS Technologies (Pty) Ltd.
  */
 
 #include "hal_variables.h"
@@ -219,21 +219,21 @@ int mcp342xConfigMode(rule_t * psR, int Xcur, int Xmax) {
  * mcp3424Identify() - device reset+register reads to ascertain exact device type
  * @return	erSUCCESS if supported device was detected, if not erFAILURE
  */
-int	mcp342xIdentify(i2c_di_t * psI2C_DI) {
-	psI2C_DI->TRXmS	= 20;
-	psI2C_DI->CLKuS = 400;			// Max 13000 (13mS)
-	psI2C_DI->Test	= 1;
+int	mcp342xIdentify(i2c_di_t * psI2C) {
+	psI2C->TRXmS	= 20;
+	psI2C->CLKuS = 400;			// Max 13000 (13mS)
+	psI2C->Test	= 1;
 	u8_t u8Buf[4];
-	int iRV = halI2CM_Queue(psI2C_DI, i2cR_B, NULL, 0, u8Buf, sizeof(u8Buf), (i2cq_p1_t) NULL, (i2cq_p2_t) (u32_t) 0);
-	psI2C_DI->Test = 0;
+	int iRV = halI2CM_Queue(psI2C, i2cR_B, NULL, 0, u8Buf, sizeof(u8Buf), (i2cq_p1_t) NULL, (i2cq_p2_t) (u32_t) 0);
+	psI2C->Test = 0;
 	IF_PX(debugTRACK && ioB1GET(ioI2Cinit), "mcp342x ID [ %-'hhY ]", sizeof(u8Buf), u8Buf);
 	if ((iRV == erSUCCESS) && (u8Buf[3] == 0x90)) {
-		psI2C_DI->Type		= i2cDEV_MCP342X;
+		psI2C->Type		= i2cDEV_MCP342X;
 		// 5 bytes = 500uS @ 100KHz, 125uS @ 400Khz
-		psI2C_DI->Speed		= i2cSPEED_400;
-		psI2C_DI->DevIdx 	= mcp342xNumDev++;
+		psI2C->Speed		= i2cSPEED_400;
+		psI2C->DevIdx 	= mcp342xNumDev++;
 		mcp342xNumCh		+= 4;						// MCP3424 specific
-		IF_P(debugTRACK && ioB1GET(ioI2Cinit),"  Addr=0x%02X", psI2C_DI->Addr);
+		IF_P(debugTRACK && ioB1GET(ioI2Cinit),"  Addr=0x%02X", psI2C->Addr);
 	}
 	return iRV;
 }
