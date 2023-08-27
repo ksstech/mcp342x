@@ -4,7 +4,7 @@
 
 #include "hal_variables.h"
 
-#if (halHAS_MCP342X)
+#if (halHAS_MCP342X > 0)
 #include "mcp342x.h"
 #include "FreeRTOS_Support.h"
 #include "printfx.h"
