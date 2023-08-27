@@ -238,9 +238,11 @@ int	mcp342xIdentify(i2c_di_t * psI2C) {
 	return iRV;
 }
 
-int	mcp342xConfig(i2c_di_t * psI2C_DI) {
+int	mcp342xConfig(i2c_di_t * psI2C) {
+
+int mcp342xReConfig(i2c_di_t * psI2C) {
 	if (psaMCP342X == NULL) {							// 1st time here...
-		IF_myASSERT(debugPARAM, psI2C_DI->DevIdx == 0);
+		IF_myASSERT(debugPARAM, psI2C->DevIdx == 0);
 		// Primary endpoint init
 		epw_t * psEWP = &table_work[URI_MCP342X];
 		psEWP->var.def = SETDEF_CVAR(0, 1, vtVALUE, cvF32, 0, 1);
@@ -266,8 +268,8 @@ int	mcp342xConfig(i2c_di_t * psI2C_DI) {
 		mcp342xNumCh = 0;			// reset to start counting up again....
 		IF_SYSTIMER_INIT(debugTIMING, stMCP342X, stMICROS, "MCP342X", 1, 300);
 	}
-	mcp342x_t * psMCP342X = &psaMCP342X[psI2C_DI->DevIdx];
-	psMCP342X->psI2C	= psI2C_DI;
+	mcp342x_t * psMCP342X = &psaMCP342X[psI2C->DevIdx];
+	psMCP342X->psI2C	= psI2C;
 	psMCP342X->NumCh	= mcp3424NUM_CHAN;				// MCP3424 specific
 	psMCP342X->ChLo		= mcp342xNumCh;				// MCP342X all models
 	psMCP342X->ChHi		= psMCP342X->ChLo + psMCP342X->NumCh - 1;
@@ -282,8 +284,6 @@ int	mcp342xConfig(i2c_di_t * psI2C_DI) {
 	IF_P(debugTRACK && ioB1GET(ioI2Cinit)," %d of %d\r\n", psI2C_DI->DevIdx, mcp342xNumDev);
 	return erSUCCESS;
 }
-
-void mcp342xReConfig(i2c_di_t * psI2C_DI) { }
 
 int	mcp342xReportChan(report_t * psR, u8_t Value) {
 	mcp342x_cfg_t sChCfg;
