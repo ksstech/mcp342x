@@ -153,7 +153,7 @@ void mcp342xReadCB(void * pvPara) {
 	u8_t ch	= psEWS->idx;							// Logical channel #
 	mcp342xSetBusy(mcp342xMap2Dev(ch), 0);
 	mcp342x_cfg_t sChCfg = { .Conf = mcp342xBuf[sizeof(mcp342xBuf)-1] };
-	IF_EXEC_1(debugCONVERT, mcp342xReportChan, sChCfg.Conf);
+	IF_EXEC_2(debugCONVERT, mcp342xReportChan, NULL, sChCfg.Conf);
 	IF_PX(debugCONVERT, " [ %-'hhY ]", sizeof(mcp342xBuf), mcp342xBuf);
 	if (sChCfg.RATE != mcp342xR18_3_75)
 		mcp342xBuf[0] = (mcp342xBuf[1] & 0x80) ? 0xFF : 0x00;
