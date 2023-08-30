@@ -247,12 +247,11 @@ int	mcp342xIdentify(i2c_di_t * psI2C) {
 }
 
 int	mcp342xConfig(i2c_di_t * psI2C) {
-	int iRV = mcp342xReConfig(psI2C);
 	mcp342x_t * psMCP342X = &psaMCP342X[psI2C->DevIdx];
 	// Default mode is 240SPS ie. 1000 / 240 = 4.167mS
 	psMCP342X->th = xTimerCreateStatic("mcp342x", pdMS_TO_TICKS(5), pdFALSE, NULL, mcp342xTimerHdlr, &psMCP342X->ts);
 	IF_P(debugTRACK && ioB1GET(ioI2Cinit)," %d of %d\r\n", psI2C->DevIdx, mcp342xNumDev);
-	return iRV;
+	return mcp342xReConfig(psI2C);
 }
 
 int mcp342xReConfig(i2c_di_t * psI2C) {
