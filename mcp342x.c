@@ -175,7 +175,7 @@ void mcp342xTimerHdlr(TimerHandle_t xTimer) {
 	u8_t dev = mcp342xMap2Dev(ch);					// Device #
 	mcp342x_t * psMCP342X = &psaMCP342X[dev];
 	int xLen = psMCP342X->Chan[ch - psMCP342X->ChLo].RATE == mcp342xR18_3_75 ? 4 : 3;
-	halI2CM_Queue(psMCP342X->psI2C, i2cRC, NULL, 0, &mcp342xBuf[4-xLen], xLen, (i2cq_p1_t) mcp342xReadCB, (i2cq_p2_t) (void *) psEWS);
+	halI2C_Queue(psMCP342X->psI2C, i2cRC, NULL, 0, &mcp342xBuf[4-xLen], xLen, (i2cq_p1_t) mcp342xReadCB, (i2cq_p2_t) (void *) psEWS);
 }
 
 void mcp342xSenseCB(void * pV) {
@@ -199,7 +199,7 @@ int	mcp342xSense(epw_t * psEWx) {
 	// Address & configure channel, start conversion
 	mcp342x_t * psMCP342X = &psaMCP342X[dev];
 	mcp342x_cfg_t sChCfg = psMCP342X->Chan[ch - psMCP342X->ChLo];
-	return halI2CM_Queue(psMCP342X->psI2C, i2cWC, &sChCfg.Conf, sizeof(u8_t), NULL, 0, (i2cq_p1_t) mcp342xSenseCB, (i2cq_p2_t) (void *) psEWx);
+	return halI2C_Queue(psMCP342X->psI2C, i2cWC, &sChCfg.Conf, sizeof(u8_t), NULL, 0, (i2cq_p1_t) mcp342xSenseCB, (i2cq_p2_t) (void *) psEWx);
 }
 
 int mcp342xConfigMode(rule_t * psR, int Xcur, int Xmax) {
@@ -232,7 +232,7 @@ int	mcp342xIdentify(i2c_di_t * psI2C) {
 	psI2C->CLKuS = 400;			// Max 13000 (13mS)
 	psI2C->Test	= 1;
 	u8_t u8Buf[4];
-	int iRV = halI2CM_Queue(psI2C, i2cR_B, NULL, 0, u8Buf, sizeof(u8Buf), (i2cq_p1_t) NULL, (i2cq_p2_t) (u32_t) 0);
+	int iRV = halI2C_Queue(psI2C, i2cR_B, NULL, 0, u8Buf, sizeof(u8Buf), (i2cq_p1_t) NULL, (i2cq_p2_t) (u32_t) 0);
 	psI2C->Test = 0;
 	IF_PX(debugTRACK && ioB1GET(ioI2Cinit), "mcp342x ID [ %-'hhY ]", sizeof(u8Buf), u8Buf);
 	if ((iRV == erSUCCESS) && (u8Buf[3] == 0x90)) {
