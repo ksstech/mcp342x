@@ -2,11 +2,12 @@
  * Copyright (c) 2021-23 Andre M. Maree / KSS Technologies (Pty) Ltd.
  */
 
-#include "hal_variables.h"
+#include "hal_config.h"
 
 #if (halHAS_MCP342X > 0)
+#include "endpoints.h"
+#include "hal_i2c_common.h"
 #include "mcp342x.h"
-#include "FreeRTOS_Support.h"
 #include "printfx.h"
 #include "syslog.h"
 #include "systiming.h"								// timing debugging
@@ -67,13 +68,13 @@
 
 mcp342x_t *	psaMCP342X = NULL;
 epw_t *	psaMCP342X_EP = NULL;
-u8_t	mcp342xNumDev = 0, mcp342xNumCh	= 0;
+u8_t mcp342xNumDev = 0, mcp342xNumCh = 0;
 
 // ################################ Forward function declaration ###################################
 
 epw_t * mcp342xGetWork(int x);
-void	mcp342xSetDefault(epw_t * psEWP, epw_t *psEWS);
-void	mcp342xSetSense(epw_t * psEWP, epw_t * psEWS);
+void mcp342xSetDefault(epw_t * psEWP, epw_t *psEWS);
+void mcp342xSetSense(epw_t * psEWP, epw_t * psEWS);
 
 // ######################################### Constants #############################################
 
@@ -88,7 +89,7 @@ const vt_enum_t	sMCP342XFunc = {
 	.work	= mcp342xGetWork,
 	.reset	= mcp342xSetDefault,
 	.sense	= mcp342xSetSense,
-	.report = NULL
+	.report = NULL,
 };
 
 // ###################################### Private functions ########################################
