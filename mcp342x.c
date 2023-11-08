@@ -118,53 +118,36 @@ int	mcp342xIdentify(i2c_di_t * psI2C) {
 }
 
 int	mcp342xConfig(i2c_di_t * psI2C) {
-	mcp342x_t * psMCP342X = &psaMCP342X[psI2C->DevIdx];
-	// Default mode is 240SPS ie. 1000 / 240 = 4.167mS
-	psMCP342X->th = xTimerCreateStatic("mcp342x", pdMS_TO_TICKS(5), pdFALSE, NULL, mcp342xTimerHdlr, &psMCP342X->ts);
-	IF_P(debugTRACK && ioB1GET(ioI2Cinit)," %d of %d\r\n", psI2C->DevIdx, mcp342xNumDev);
-	return mcp342xReConfig(psI2C);
-}
+	if (!psI2C->IDok) return erINV_STATE;
 
-int mcp342xReConfig(i2c_di_t * psI2C) {
 	if (psaMCP342X == NULL) {							// 1st time here...
 		IF_myASSERT(debugPARAM, psI2C->DevIdx == 0);
-		// Primary endpoint init
-		epw_t * psEWP = &table_work[URI_MCP342X];
-		psEWP->var.def = SETDEF_CVAR(0, 1, vtVALUE, cvF32, 0, 1);
-		psEWP->var.def.cv.vc	= mcp342xNumCh;
-		psEWP->var.val.px.pv	= (void *) &sMCP342XFunc;
-		psEWP->Tsns = psEWP->Rsns = MCP342X_T_SNS;
-		psEWP->uri = URI_MCP342X;
-		psEWP->fSECsns = 1;								// req due to delays, no parallel reads
-
-		// Init secondary/enumerated endpoint
-		psaMCP342X_EP = pvRtosMalloc(mcp342xNumCh * sizeof(epw_t));
-		memset(psaMCP342X_EP, 0, mcp342xNumCh * sizeof(epw_t));
-		for (int ch = 0; ch < mcp342xNumCh; ++ch) {
-			epw_t * psEWS = &psaMCP342X_EP[ch];
-			psEWS->var.def = SETDEF_CVAR(0, 1, vtVALUE, cvF32, 1, 0);
-			psEWS->Tsns = psEWS->Rsns = MCP342X_T_SNS;
-			psEWS->uri = URI_MCP342X;
-			psEWS->idx = ch;
-		}
 		// Device array init
 		psaMCP342X = pvRtosMalloc(mcp342xNumDev * sizeof(mcp342x_t));
+		if (!psaMCP342X) return erNO_MEM;
+
 		memset(psaMCP342X, 0, mcp342xNumDev * sizeof(mcp342x_t));
 		mcp342xNumCh = 0;			// reset to start counting up again....
 		IF_SYSTIMER_INIT(debugTIMING, stMCP342X, stMICROS, "MCP342X", 1, 300);
 	}
-	mcp342x_t * psMCP342X = &psaMCP342X[psI2C->DevIdx];
-	psMCP342X->psI2C	= psI2C;
-	psMCP342X->NumCh	= mcp3424NUM_CHAN;				// MCP3424 specific
-	psMCP342X->ChLo		= mcp342xNumCh;				// MCP342X all models
-	psMCP342X->ChHi		= psMCP342X->ChLo + psMCP342X->NumCh - 1;
-	mcp342xNumCh		+= psMCP342X->NumCh;
-	for (int ch = 0; ch < psMCP342X->NumCh; ++ch) {
-		psMCP342X->Chan[ch].Conf = 0x90;
-		psMCP342X->Chan[ch].CHAN = ch;
-		maskSET2B(psMCP342X->Modes, ch, mcp342xM1, u32_t);	// default mode
+	if (!psI2C->CFGok) {
+		mcp342x_t * psMCP342X = &psaMCP342X[psI2C->DevIdx];
+		psMCP342X->psI2C = psI2C;
+		psMCP342X->NumCh = mcp3424NUM_CHAN;				// MCP3424 specific
+		psMCP342X->ChLo = mcp342xNumCh;					// MCP342X all models
+		psMCP342X->ChHi = psMCP342X->ChLo + psMCP342X->NumCh - 1;
+		mcp342xNumCh += psMCP342X->NumCh;
+		for (int ch = 0; ch < psMCP342X->NumCh; ++ch) {
+			psMCP342X->Chan[ch].Conf = 0x90;
+			psMCP342X->Chan[ch].CHAN = ch;
+			maskSET2B(psMCP342X->Modes, ch, mcp342xM1, u32_t);	// default mode
+		}
+		// Default mode is 240SPS ie. 1000 / 240 = 4.167mS
+		psMCP342X->th = xTimerCreateStatic("mcp342x", pdMS_TO_TICKS(5), pdFALSE, NULL, mcp342xTimerHdlr, &psMCP342X->ts);
 	}
-	return erSUCCESS;
+	psI2C->CFGok = 1;
+exit:
+	return iRV;
 }
 
 int	mcp342xReportChan(report_t * psR, u8_t Value) {
@@ -194,4 +177,5 @@ int	mcp342xReportAll(report_t * psR) {
 	}
 	return iRV;
 }
+
 #endif
