@@ -1,5 +1,5 @@
 /*
- * mcp342x.h - Copyright (c) 2021-23 Andre M. Maree/KSS Technologies (Pty) Ltd.
+ * mcp342x.h - Copyright (c) 2021-24 Andre M. Maree/KSS Technologies (Pty) Ltd.
  */
 
 #pragma once
