@@ -4,7 +4,7 @@
 
 #include "hal_config.h"
 
-#if (halHAS_MCP342X > 0)
+#if (HAL_MCP342X > 0)
 #include "endpoints.h"
 #include "hal_i2c_common.h"
 #include "mcp342x.h"
