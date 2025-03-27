@@ -6,7 +6,7 @@
 #include "endpoints.h"
 #include "hal_i2c_common.h"
 #include "mcp342x.h"
-#include "printfx.h"
+#include "report.h"
 #include "syslog.h"
 #include "systiming.h"								// timing debugging
 #include "errors_events.h"
