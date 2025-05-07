@@ -148,17 +148,17 @@ exit:
 int	mcp342xReportChan(report_t * psR, u8_t Value) {
 	mcp342x_cfg_t sChCfg;
 	sChCfg.Conf = Value;
-	return wprintfx(psR, "  Cfg=0x%02X  nRDY=%d  C=%d  OS_C=%d  SAMP=%d  PGA=%d",
+	return xReport(psR, "  Cfg=0x%02X  nRDY=%d  C=%d  OS_C=%d  SAMP=%d  PGA=%d",
 			sChCfg.Conf, sChCfg.nRDY, sChCfg.CHAN, sChCfg.OS_C, sChCfg.RATE, sChCfg.PGA);
 }
 
 int	mcp342xReportDev(report_t * psR, mcp342x_t * psMCP342X) {
 	int iRV = 0;
 	for (int ch = 0; ch < psMCP342X->NumCh; ++ch) {
-		iRV += wprintfx(psR, "#%d - A=0x%02X", ch, psMCP342X->psI2C->Addr);
+		iRV += xReport(psR, "#%d - A=0x%02X", ch, psMCP342X->psI2C->Addr);
 		iRV += mcp342xReportChan(psR, psMCP342X->Chan[ch].Conf);
 		int LogCh = psMCP342X->ChLo + ch;
-		iRV += wprintfx(psR, "  L=%d  vNorm=%f\r\n", psMCP342X->ChLo + ch, xCV_GetValueScaled(&psaMCP342X_EP[LogCh].var, NULL).f64);
+		iRV += xReport(psR, "  L=%d  vNorm=%f\r\n", psMCP342X->ChLo + ch, xCV_GetValueScaled(&psaMCP342X_EP[LogCh].var, NULL).f64);
 	}
 	return iRV;
 }
